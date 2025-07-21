@@ -40,6 +40,10 @@ const MandapsListPage = () => {
     setMandaps(mockMandaps);
   }, []);
 
+  const handleDelete = (mandapId) => {
+    setMandaps(prevMandaps => prevMandaps.filter(mandap => mandap.id !== mandapId));
+  };
+
   const filteredMandaps = mandaps.filter(mandap => {
     const matchesSearch = mandap.mandapName.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           mandap.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -82,7 +86,7 @@ const MandapsListPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredMandaps.map(mandap => (
-          <MandapCard key={mandap.id} mandap={mandap} />
+          <MandapCard key={mandap.id} mandap={mandap} onDelete={handleDelete} />
         ))}
       </div>
 
