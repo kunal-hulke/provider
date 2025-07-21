@@ -3,26 +3,30 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
-const Layout: React.FC = () => {
+const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   
-  const getTitleFromPath = (path: string) => {
-    const pathMap: Record<string, string> = {
+  const getTitleFromPath = (path) => {
+    const pathMap = {
       '/dashboard': 'Dashboard',
       '/calendar': 'Booking Calendar',
       '/bookings': 'Bookings',
       '/payments': 'Payments',
-      '/mandaps': 'Mandap',
+      '/mandaps': 'Mandaps',
       '/mandaps/new': 'Add New Mandap',
       '/mandaps/edit': 'Edit Mandap',
-      '/customers': 'Customers',
-      '/settings': 'Settings',
+      '/reviews': 'Reviews',
+      '/profile': 'Profile',
+      '/notifications': 'Notifications',
     };
     
     // Extract base path for dynamic routes
     if (path.startsWith('/mandaps/edit/')) {
       return 'Edit Mandap';
+    }
+    if (path.includes('/reviews')) {
+      return 'Reviews';
     }
     
     return pathMap[path] || 'Dashboard';
@@ -31,29 +35,34 @@ const Layout: React.FC = () => {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
   
   return (
     <div className="h-screen flex overflow-hidden bg-gray-50">
-      {/* Mobile sidebar */}
-      <div className={`fixed inset-0 flex z-40 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity" 
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
-          <Sidebar />
-        </div>
-      </div>
+          className="fixed inset-0 bg-black bg-opacity-50 transition-opacity z-40 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
       
-      {/* Desktop sidebar */}
-      <div className="hidden lg:flex lg:flex-shrink-0">
-        <Sidebar />
+      {/* Sidebar */}
+      <div className={`
+        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
+        lg:translate-x-0 lg:static lg:inset-0 lg:z-auto
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <Sidebar onClose={closeSidebar} />
       </div>
       
       {/* Main content */}
-      <div className="flex flex-col w-0 flex-1 overflow-hidden">
+      <div className="flex flex-col w-0 flex-1 overflow-hidden lg:w-full">
         <Header
-          toggleSidebar={toggleSidebar}
+          onMenuClick={toggleSidebar}
           title={getTitleFromPath(location.pathname)}
         />
         

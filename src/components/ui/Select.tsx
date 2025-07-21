@@ -13,6 +13,7 @@ interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>
   fullWidth?: boolean;
   onChange?: (value: string) => void;
   className?: string;
+  icon?: React.ReactNode;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -23,6 +24,7 @@ const Select: React.FC<SelectProps> = ({
   fullWidth = false,
   onChange,
   className = '',
+  icon,
   ...props
 }) => {
   const id = props.id || props.name || Math.random().toString(36).substring(2, 9);
@@ -43,23 +45,31 @@ const Select: React.FC<SelectProps> = ({
           {label}
         </label>
       )}
-      <select
-        id={id}
-        className={`
-          block bg-white border rounded-md px-3 py-2 text-gray-900 focus:outline-none 
-          focus:ring-2 focus:ring-primary-500 focus:border-primary-500
-          ${error ? 'border-error-500' : 'border-gray-300'}
-          ${fullWidth ? 'w-full' : ''}
-        `}
-        onChange={handleChange}
-        {...props}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        {icon && (
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+            {icon}
+          </div>
+        )}
+        <select
+          id={id}
+          className={`
+            block bg-white border rounded-md py-2 text-gray-900 focus:outline-none 
+            focus:ring-2 focus:ring-primary-500 focus:border-primary-500
+            ${error ? 'border-error-500' : 'border-gray-300'}
+            ${fullWidth ? 'w-full' : ''}
+            ${icon ? 'pl-10 pr-3' : 'px-3'}
+          `}
+          onChange={handleChange}
+          {...props}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
       {error && <p className="mt-1 text-sm text-error-500">{error}</p>}
       {helperText && !error && <p className="mt-1 text-sm text-gray-500">{helperText}</p>}
     </div>

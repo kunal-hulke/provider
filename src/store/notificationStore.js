@@ -1,8 +1,7 @@
 import { create } from 'zustand';
-import { Notification } from '../types';
 
 // Mock notifications data
-const mockNotifications: Notification[] = [
+const mockNotifications = [
   {
     id: '1',
     userId: '1',
@@ -22,18 +21,20 @@ const mockNotifications: Notification[] = [
     read: false,
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     data: { reviewId: '1', mandapId: '2' }
+  },
+  {
+    id: '3',
+    userId: '1',
+    type: 'payment',
+    title: 'Payment Received',
+    message: 'Payment of ₹75,000 received for Laxmi Garden booking',
+    read: true,
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    data: { bookingId: '1', mandapId: '1' }
   }
 ];
-interface NotificationStore {
-  notifications: Notification[];
-  unreadCount: number;
-  addNotification: (notification: Notification) => void;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  removeNotification: (id: string) => void;
-}
 
-export const useNotificationStore = create<NotificationStore>((set) => ({
+export const useNotificationStore = create((set) => ({
   notifications: mockNotifications,
   unreadCount: mockNotifications.filter(n => !n.read).length,
   addNotification: (notification) =>

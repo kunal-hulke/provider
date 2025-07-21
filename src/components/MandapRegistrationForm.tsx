@@ -1,25 +1,21 @@
+import React from 'react';
+import { Card, CardContent } from './ui/Card';
+
 const MandapRegistrationForm: React.FC = () => {
-  // Previous code remains the same
-
   return (
-    <FormDataProvider>
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8 relative">
-          <Steps current={currentStep} className="site-navigation-steps">
-            {steps.map((item, index) => (
-              <Step 
-                key={item.title} 
-                title={item.title}
-                className={`step-item ${index < currentStep ? 'completed' : ''}`}
-              />
-            ))}
-          </div>
-          {/* Add connecting lines */}
-          <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -z-10 transform -translate-y-1/2" />
-        </div>
-
-        {/* Rest of the component remains the same */}
-      </div>
-    </FormDataProvider>
+    <div className="max-w-4xl mx-auto p-6">
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            Mandap Registration Form
+          </h2>
+          <p className="text-gray-600">
+            This component is currently under development. Please use the Mandap Management section in the sidebar to add new mandaps.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
+
+export default MandapRegistrationForm;

@@ -67,7 +67,7 @@ const Sidebar: React.FC = () => {
             >
               <span className="flex items-center">
                 <Building className="mr-3 h-5 w-5" />
-                Mandap Management
+                Mandap
               </span>
               <ChevronDown className={`h-4 w-4 transition-transform ${isManagementOpen ? 'transform rotate-180' : ''}`} />
             </button>

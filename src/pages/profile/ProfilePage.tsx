@@ -27,8 +27,7 @@ const ProfilePage: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await updateProfile(formData);
       toast.success('Profile updated successfully');
     } catch (error) {
       toast.error('Failed to update profile');
@@ -46,15 +45,15 @@ const ProfilePage: React.FC = () => {
           <div className="flex items-center space-x-6 mb-8">
             <div className="relative">
               <div className="h-24 w-24 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 text-3xl font-semibold">
-                {user?.name?.charAt(0)}
+                {user?.name?.charAt(0) || 'U'}
               </div>
               <button className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-200 text-gray-600 hover:text-primary-600">
                 <Camera className="h-4 w-4" />
               </button>
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">{user?.name}</h2>
-              <p className="text-gray-500">{user?.email}</p>
+              <h2 className="text-xl font-semibold text-gray-900">{user?.name || 'User'}</h2>
+              <p className="text-gray-500">{user?.email || 'No email'}</p>
             </div>
           </div>
 
@@ -66,6 +65,7 @@ const ProfilePage: React.FC = () => {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                fullWidth
               />
               <Input
                 label="Email"
@@ -75,6 +75,7 @@ const ProfilePage: React.FC = () => {
                 onChange={handleChange}
                 required
                 disabled
+                fullWidth
               />
               <Input
                 label="Phone Number"
@@ -82,24 +83,28 @@ const ProfilePage: React.FC = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 required
+                fullWidth
               />
               <Input
                 label="Address"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
+                fullWidth
               />
               <Input
                 label="City"
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
+                fullWidth
               />
               <Input
                 label="State"
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
+                fullWidth
               />
             </div>
 

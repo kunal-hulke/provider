@@ -1,21 +1,10 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { User } from '../types';
 import { currentUser } from '../utils/mock-data';
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string, phone: string) => Promise<boolean>;
-  updateProfile: (data: Partial<User>) => Promise<void>;
-  logout: () => void;
-  loading: boolean;
-}
+const AuthContext = createContext(undefined);
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,7 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email, password) => {
     try {
       // In a real app, this would be an API call
       // For demo, check if email matches mock data
@@ -48,16 +37,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (
-    name: string,
-    email: string,
-    password: string,
-    phone: string
-  ): Promise<boolean> => {
+  const register = async (name, email, password, phone) => {
     try {
       // In a real app, this would be an API call
       // For demo, create a mock user and log them in
-      const newUser: User = {
+      const newUser = {
         id: '2',
         name,
         email,
@@ -74,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateProfile = async (data: Partial<User>): Promise<void> => {
+  const updateProfile = async (data) => {
     try {
       if (user) {
         const updatedUser = { ...user, ...data };
