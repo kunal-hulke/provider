@@ -1,18 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Users, Camera, Utensils, Bed } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
+import { caterers, photographers, rooms } from '../../utils/mock-data';
 
 const VendorsPage = () => {
-  const [activeTab, setActiveTab] = useState('caterers');
-
-  const vendorTypes = [
-    { id: 'caterers', name: 'Caterers', icon: Utensils, count: 5 },
-    { id: 'photographers', name: 'Photographers', icon: Camera, count: 3 },
-    { id: 'rooms', name: 'Rooms', icon: Bed, count: 8 },
-  ];
-
   return (
     <div className="space-y-6 p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -37,28 +30,41 @@ const VendorsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {vendorTypes.map((type) => {
-          const IconComponent = type.icon;
-          return (
-            <Card key={type.id} className="cursor-pointer hover:shadow-lg transition-shadow">
-              <CardContent className="p-6 text-center">
-                <div className="p-4 bg-primary-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <IconComponent className="h-8 w-8 text-primary-500" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{type.name}</h3>
-                <p className="text-3xl font-bold text-primary-600 mb-2">{type.count}</p>
-                <p className="text-sm text-gray-500">Active {type.name.toLowerCase()}</p>
-                <div className="mt-4">
-                  <Link to={`/vendors/${type.id}`}>
-                    <Button variant="outline" size="sm" fullWidth>
-                      Manage {type.name}
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <CardContent className="p-6 text-center">
+            <div className="p-4 bg-primary-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <Utensils className="h-8 w-8 text-primary-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Caterers</h3>
+            <p className="text-3xl font-bold text-primary-600 mb-2">{caterers.length}</p>
+            <p className="text-sm text-gray-500">Active caterers</p>
+            <div className="mt-4">
+              <Link to="/vendors/caterers/new">
+                <Button variant="outline" size="sm" fullWidth>
+                  Add Caterer
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <CardContent className="p-6 text-center">
+            <div className="p-4 bg-primary-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <Camera className="h-8 w-8 text-primary-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Photographers</h3>
+            <p className="text-3xl font-bold text-primary-600 mb-2">{photographers.length}</p>
+            <p className="text-sm text-gray-500">Active photographers</p>
+            <div className="mt-4">
+              <Link to="/vendors/photographers/new">
+                <Button variant="outline" size="sm" fullWidth>
+                  Add Photographer
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Star, Image as ImageIcon, Filter, Search, ArrowLeft } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -7,7 +7,6 @@ import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import { reviews, mandaps } from '../../utils/mock-data';
 import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
 
 export default function ReviewsPage() {
   const { id } = useParams();
@@ -16,7 +15,7 @@ export default function ReviewsPage() {
   const [ratingFilter, setRatingFilter] = useState('all');
   
   // If id is provided, show reviews for specific mandap, otherwise show all reviews
-  const filteredReviews = reviews.filter(review => {
+  let filteredReviews = reviews.filter(review => {
     if (id && review.mandapId !== id) return false;
     
     const matchesSearch = review.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -26,6 +25,18 @@ export default function ReviewsPage() {
     
     return matchesSearch && matchesRating;
   });
+  
+  // If no specific mandap ID, show all reviews
+  if (!id) {
+    filteredReviews = reviews.filter(review => {
+      const matchesSearch = review.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           review.comment.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesRating = ratingFilter === 'all' || review.rating.toString() === ratingFilter;
+      
+      return matchesSearch && matchesRating;
+    });
+  }
   
   const mandap = id ? mandaps.find(m => m.id === id) : null;
   const averageRating = filteredReviews.length > 0
@@ -45,18 +56,21 @@ export default function ReviewsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        {id && (
-          <Button
-            variant="ghost"
-            size="sm"
-            icon={<ArrowLeft className="h-4 w-4" />}
-            onClick={() => navigate('/mandaps')}
-          >
-            Back to Mandaps
-          </Button>
-        )}
+        <div className="flex items-center">
+          {id && (
+            <Button
+              variant="ghost"
+              size="sm"
+              icon={<ArrowLeft className="h-4 w-4" />}
+              onClick={() => navigate('/mandaps')}
+              className="mr-4"
+            >
+              Back to Mandaps
+            </Button>
+          )}
+        </div>
         <h1 className="text-2xl font-bold text-gray-900">
-          {mandap ? `Reviews for ${mandap.mandapName}` : 'All Reviews'}
+          {mandap ? `Reviews for ${mandap.mandapName || mandap.name}` : 'All Reviews'}
         </h1>
         <div className="flex items-center space-x-2">
           <div className="flex items-center">
@@ -172,7 +186,7 @@ export default function ReviewsPage() {
                       
                       {!mandap && reviewMandap && (
                         <p className="text-sm text-primary-600 mb-2">
-                          Review for: {reviewMandap.name}
+                          Review for: {reviewMandap.mandapName || reviewMandap.name}
                         </p>
                       )}
                       
