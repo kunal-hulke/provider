@@ -54,10 +54,9 @@ const Select: React.FC<SelectProps> = ({
         <select
           id={id}
           className={`
-            block bg-white border rounded-md py-2 text-gray-900 focus:outline-none 
+            block w-full bg-white border rounded-md py-2 text-gray-900 focus:outline-none 
             focus:ring-2 focus:ring-primary-500 focus:border-primary-500
             ${error ? 'border-error-500' : 'border-gray-300'}
-            ${fullWidth ? 'w-full' : ''}
             ${icon ? 'pl-10 pr-3' : 'px-3'}
           `}
           onChange={handleChange}

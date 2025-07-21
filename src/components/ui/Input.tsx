@@ -31,10 +31,9 @@ const Input: React.FC<InputProps> = ({
       <input
         id={id}
         className={`
-          block bg-white border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400
+          block w-full bg-white border rounded-md px-3 py-2 text-gray-900 placeholder:text-gray-400
           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500
           ${error ? 'border-error-500' : 'border-gray-300'}
-          ${fullWidth ? 'w-full' : ''}
         `}
         {...props}
       />

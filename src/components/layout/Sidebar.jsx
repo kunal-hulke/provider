@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Calendar, Book, Settings, LogOut, DollarSign, ChevronDown, Building, Users } from 'lucide-react';
+import { Home, Calendar, Book, Settings, LogOut, DollarSign, ChevronDown, Building, Users, Store } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Sidebar({ onClose }) {
@@ -13,6 +13,7 @@ export default function Sidebar({ onClose }) {
     { name: 'Bookings', href: '/bookings', icon: Book },
     { name: 'Payments', href: '/payments', icon: DollarSign },
     { name: 'Reviews', href: '/reviews', icon: Users },
+    { name: 'Vendors', href: '/vendors', icon: Store },
   ];
 
   const handleNavClick = () => {

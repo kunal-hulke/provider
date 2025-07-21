@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Star, Image as ImageIcon, Filter, Search } from 'lucide-react';
+import { Star, Image as ImageIcon, Filter, Search, ArrowLeft } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
 import { reviews, mandaps } from '../../utils/mock-data';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 export default function ReviewsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [ratingFilter, setRatingFilter] = useState('all');
   
@@ -42,6 +45,16 @@ export default function ReviewsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
+        {id && (
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<ArrowLeft className="h-4 w-4" />}
+            onClick={() => navigate('/mandaps')}
+          >
+            Back to Mandaps
+          </Button>
+        )}
         <h1 className="text-2xl font-bold text-gray-900">
           {mandap ? `Reviews for ${mandap.mandapName}` : 'All Reviews'}
         </h1>

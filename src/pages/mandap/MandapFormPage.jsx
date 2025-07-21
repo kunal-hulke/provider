@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Building, ArrowLeft, Save, Plus, X, Upload, Check } from 'lucide-react';
+import { Building, ArrowLeft, Save, Plus, X, Upload, Check, Calendar } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
@@ -12,9 +12,8 @@ import { toast } from 'sonner';
 const steps = [
   { id: 1, name: 'Basic Info', completed: false },
   { id: 2, name: 'Venue Details', completed: false },
-  { id: 3, name: 'Services', completed: false },
-  { id: 4, name: 'Facilities', completed: false },
-  { id: 5, name: 'Booking & Payments', completed: false },
+  { id: 3, name: 'Facilities', completed: false },
+  { id: 4, name: 'Booking & Payments', completed: false },
 ];
 
 const venueTypes = [
@@ -34,6 +33,17 @@ const outdoorFacilitiesOptions = [
 ];
 
 const paymentOptions = ['Cash', 'Credit Card', 'Debit Card', 'UPI', 'Net Banking'];
+
+const statesAndCities = {
+  'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Aurangabad'],
+  'Delhi': ['New Delhi', 'Central Delhi', 'South Delhi', 'North Delhi', 'East Delhi'],
+  'Karnataka': ['Bangalore', 'Mysore', 'Hubli', 'Mangalore', 'Belgaum'],
+  'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar'],
+  'Rajasthan': ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner'],
+  'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem'],
+  'West Bengal': ['Kolkata', 'Howrah', 'Durgapur', 'Asansol', 'Siliguri'],
+  'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Ghaziabad', 'Agra', 'Varanasi']
+};
 
 export default function MandapFormPage() {
   const { id } = useParams();
@@ -64,21 +74,9 @@ export default function MandapFormPage() {
     securityDeposit: '',
     securityDepositType: '',
     
-    // Services
-    caterers: [],
-    photographers: [],
-    
     // Facilities
     amenities: [],
     outdoorFacilities: [],
-    rooms: {
-      acRooms: '',
-      nonAcRooms: '',
-      totalRooms: '',
-      acRoomPrice: '',
-      nonAcRoomPrice: '',
-      roomAmenities: [],
-    },
     
     // Booking & Payments
     advancePayment: '',
@@ -88,35 +86,27 @@ export default function MandapFormPage() {
     isExternalCateringAllowed: false,
   });
 
+  const [availableCities, setAvailableCities] = useState([]);
+
   useEffect(() => {
     if (isEditing) {
       const mandap = mandaps.find(m => m.id === id);
       if (mandap) {
         setFormData({
-          ownerName: 'Raj Patel', // Mock owner name
-          mandapName: mandap.mandapName,
+          ownerName: 'Raj Patel',
+          mandapName: mandap.mandapName || mandap.name,
           availableDates: mandap.availableDates || [],
           venueType: mandap.venueType || [],
           address: mandap.address || { street: '', city: '', state: '', pincode: '' },
           penaltyChargesPerHour: mandap.penaltyChargesPerHour?.toString() || '',
           cancellationPolicy: mandap.cancellationPolicy || '',
-          venueImages: mandap.venueImages || [],
-          guestCapacity: mandap.guestCapacity?.toString() || '',
-          venuePricing: mandap.venuePricing?.toString() || '',
+          venueImages: mandap.venueImages || mandap.images || [],
+          guestCapacity: mandap.guestCapacity?.toString() || mandap.capacity?.toString() || '',
+          venuePricing: mandap.venuePricing?.toString() || mandap.price?.toString() || '',
           securityDeposit: mandap.securityDeposit?.toString() || '',
           securityDepositType: mandap.securityDepositType || '',
-          caterers: [],
-          photographers: [],
           amenities: mandap.amenities || [],
           outdoorFacilities: mandap.outdoorFacilities || [],
-          rooms: {
-            acRooms: '',
-            nonAcRooms: '',
-            totalRooms: '',
-            acRoomPrice: '',
-            nonAcRoomPrice: '',
-            roomAmenities: [],
-          },
           advancePayment: '',
           paymentMethods: mandap.paymentOptions || [],
           bookingConfirmationTimeline: '',
@@ -126,6 +116,14 @@ export default function MandapFormPage() {
       }
     }
   }, [id, isEditing]);
+
+  useEffect(() => {
+    if (formData.address.state) {
+      setAvailableCities(statesAndCities[formData.address.state] || []);
+    } else {
+      setAvailableCities([]);
+    }
+  }, [formData.address.state]);
 
   const handleInputChange = (field, value) => {
     if (field.includes('.')) {
@@ -154,11 +152,28 @@ export default function MandapFormPage() {
     }));
   };
 
-  const handleImageAdd = (url) => {
-    if (url && !formData.venueImages.includes(url)) {
+  const handleDateAdd = (date) => {
+    if (date && !formData.availableDates.includes(date)) {
       setFormData(prev => ({
         ...prev,
-        venueImages: [...prev.venueImages, url],
+        availableDates: [...prev.availableDates, date],
+      }));
+    }
+  };
+
+  const handleDateRemove = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      availableDates: prev.availableDates.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleImageAdd = (files) => {
+    if (files && files.length > 0) {
+      const newImages = Array.from(files).map(file => URL.createObjectURL(file));
+      setFormData(prev => ({
+        ...prev,
+        venueImages: [...prev.venueImages, ...newImages],
       }));
     }
   };
@@ -171,7 +186,7 @@ export default function MandapFormPage() {
   };
 
   const nextStep = () => {
-    if (currentStep < 5) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -192,9 +207,9 @@ export default function MandapFormPage() {
   };
 
   const renderStepIndicator = () => (
-    <div className="flex items-center justify-between mb-8">
+    <div className="flex items-center justify-between mb-8 overflow-x-auto">
       {steps.map((step, index) => (
-        <div key={step.id} className="flex items-center">
+        <div key={step.id} className="flex items-center min-w-0">
           <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
             currentStep === step.id 
               ? 'bg-orange-500 border-orange-500 text-white' 
@@ -204,13 +219,13 @@ export default function MandapFormPage() {
           }`}>
             {currentStep > step.id ? <Check className="w-5 h-5" /> : step.id}
           </div>
-          <span className={`ml-2 text-sm font-medium ${
+          <span className={`ml-2 text-sm font-medium whitespace-nowrap ${
             currentStep >= step.id ? 'text-gray-900' : 'text-gray-500'
           }`}>
             {step.name}
           </span>
           {index < steps.length - 1 && (
-            <div className={`w-16 h-0.5 mx-4 ${
+            <div className={`w-8 sm:w-16 h-0.5 mx-2 sm:mx-4 ${
               currentStep > step.id ? 'bg-orange-500' : 'bg-gray-300'
             }`} />
           )}
@@ -221,7 +236,7 @@ export default function MandapFormPage() {
 
   const renderBasicInfo = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Input
           label="Venue Owner/Manager Name"
           value={formData.ownerName}
@@ -244,18 +259,41 @@ export default function MandapFormPage() {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Available Dates <span className="text-red-500">*</span>
         </label>
-        <input
-          type="date"
-          className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-          placeholder="Select date"
-        />
+        <div className="flex flex-col sm:flex-row gap-2 mb-2">
+          <input
+            type="date"
+            min={new Date().toISOString().split('T')[0]}
+            className="flex-1 block border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            onChange={(e) => {
+              if (e.target.value) {
+                handleDateAdd(e.target.value);
+                e.target.value = '';
+              }
+            }}
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {formData.availableDates.map((date, index) => (
+            <div key={index} className="inline-flex items-center bg-primary-100 rounded-full px-3 py-1 text-sm">
+              <Calendar className="w-4 h-4 mr-1" />
+              <span>{new Date(date).toLocaleDateString()}</span>
+              <button
+                type="button"
+                onClick={() => handleDateRemove(index)}
+                className="ml-2 text-primary-600 hover:text-primary-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Venue Type <span className="text-red-500">*</span>
         </label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
           {venueTypes.map((type) => (
             <label key={type} className="flex items-center">
               <input
@@ -270,30 +308,30 @@ export default function MandapFormPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Select
           label="State"
           options={[
             { value: '', label: 'Select state' },
-            { value: 'Maharashtra', label: 'Maharashtra' },
-            { value: 'Delhi', label: 'Delhi' },
-            { value: 'Karnataka', label: 'Karnataka' },
+            ...Object.keys(statesAndCities).map(state => ({ value: state, label: state }))
           ]}
           value={formData.address.state}
-          onChange={(value) => handleInputChange('address.state', value)}
+          onChange={(value) => {
+            handleInputChange('address.state', value);
+            handleInputChange('address.city', '');
+          }}
           fullWidth
         />
         <Select
           label="City"
           options={[
             { value: '', label: 'Select city' },
-            { value: 'Mumbai', label: 'Mumbai' },
-            { value: 'Delhi', label: 'Delhi' },
-            { value: 'Bangalore', label: 'Bangalore' },
+            ...availableCities.map(city => ({ value: city, label: city }))
           ]}
           value={formData.address.city}
           onChange={(value) => handleInputChange('address.city', value)}
           fullWidth
+          disabled={!formData.address.state}
         />
         <Input
           label="Pin Code"
@@ -314,7 +352,7 @@ export default function MandapFormPage() {
         rows={3}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Input
           label="Penalty Charges per Hour (₹)"
           type="number"
@@ -349,11 +387,21 @@ export default function MandapFormPage() {
         </label>
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
           <Upload className="mx-auto h-12 w-12 text-gray-400" />
-          <p className="mt-2 text-sm text-gray-600">Upload venue images</p>
-          <input type="file" multiple accept="image/*" className="hidden" />
+          <p className="mt-2 text-sm text-gray-600">Upload venue images (Multiple selection allowed)</p>
+          <input 
+            type="file" 
+            multiple 
+            accept="image/*" 
+            className="hidden" 
+            id="venue-images"
+            onChange={(e) => handleImageAdd(e.target.files)}
+          />
+          <label htmlFor="venue-images" className="mt-2 inline-block cursor-pointer bg-primary-500 text-white px-4 py-2 rounded-md hover:bg-primary-600">
+            Choose Images
+          </label>
         </div>
         {formData.venueImages.length > 0 && (
-          <div className="grid grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
             {formData.venueImages.map((image, index) => (
               <div key={index} className="relative">
                 <img src={image} alt={`Venue ${index + 1}`} className="w-full h-32 object-cover rounded" />
@@ -369,7 +417,7 @@ export default function MandapFormPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Input
           label="Guest Capacity (max)"
           type="number"
@@ -389,7 +437,7 @@ export default function MandapFormPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Input
           label="Security Deposit (₹)"
           type="number"
@@ -415,247 +463,105 @@ export default function MandapFormPage() {
     </div>
   );
 
-  const renderServices = () => (
-    <div className="space-y-6">
-      {/* Catering Services */}
-      <div className="bg-orange-50 p-4 rounded-lg">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Catering Services</h3>
-          <label className="flex items-center">
-            <input type="checkbox" className="mr-2" />
-            <span>Enable</span>
-          </label>
-        </div>
-        
-        <div className="bg-yellow-50 p-4 rounded border">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="font-medium">Caterer #1</h4>
-            <button className="text-red-500 text-sm">Remove</button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Caterer Name"
-              placeholder="Please enter caterer name"
-              required
-              fullWidth
-            />
-            <Input
-              label="Food Type"
-              placeholder="Please select food type"
-              required
-              fullWidth
-            />
-          </div>
-          <div className="mt-4">
-            <button className="text-orange-500 text-sm">+ Add Menu Category</button>
-          </div>
-          <div className="flex items-center space-x-6 mt-4">
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span>Customization Allowed</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span>External Catering Allowed</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span>Tasting Session Available</span>
-            </label>
-          </div>
-        </div>
-        
-        <button className="mt-4 text-orange-500">+ Add Caterer</button>
-      </div>
-
-      {/* Photography Services */}
-      <div className="bg-orange-50 p-4 rounded-lg">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Photography Services</h3>
-          <label className="flex items-center">
-            <input type="checkbox" className="mr-2" />
-            <span>Enable</span>
-          </label>
-        </div>
-        
-        <div className="bg-blue-50 p-4 rounded border">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="font-medium">Photographer #1</h4>
-            <button className="text-red-500 text-sm">Remove</button>
-          </div>
-          <Input
-            label="Photographer Name"
-            required
-            fullWidth
-          />
-          <div className="mt-4 border-2 border-dashed border-orange-300 p-4 rounded text-center">
-            <button className="text-orange-500">Add Photography Type</button>
-          </div>
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Sample Work</label>
-            <div className="border-2 border-dashed border-gray-300 rounded p-4 text-center">
-              <Upload className="mx-auto h-8 w-8 text-gray-400" />
-              <p className="text-sm text-gray-600">Upload</p>
-            </div>
-          </div>
-        </div>
-        
-        <button className="mt-4 text-orange-500">+ Add Photographer</button>
-      </div>
-    </div>
-  );
-
   const renderFacilities = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Rooms & Accommodation */}
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">Rooms & Accommodation</h3>
-          <div className="space-y-4">
-            <Input
-              label="AC Rooms"
-              type="number"
-              value={formData.rooms.acRooms}
-              onChange={(e) => handleInputChange('rooms.acRooms', e.target.value)}
-              required
-              fullWidth
-            />
-            <Input
-              label="Non-AC Rooms"
-              type="number"
-              value={formData.rooms.nonAcRooms}
-              onChange={(e) => handleInputChange('rooms.nonAcRooms', e.target.value)}
-              required
-              fullWidth
-            />
-            <Input
-              label="Total Rooms Available"
-              type="number"
-              value={formData.rooms.totalRooms}
-              onChange={(e) => handleInputChange('rooms.totalRooms', e.target.value)}
-              required
-              fullWidth
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="AC Room Price (₹)"
-                type="number"
-                value={formData.rooms.acRoomPrice}
-                onChange={(e) => handleInputChange('rooms.acRoomPrice', e.target.value)}
-                placeholder="₹ 0"
-                required
-                fullWidth
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Indoor Amenities
+        </label>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+          {amenitiesOptions.map((amenity) => (
+            <label key={amenity} className="flex items-center">
+              <input
+                type="checkbox"
+                checked={formData.amenities.includes(amenity)}
+                onChange={() => handleArrayToggle('amenities', amenity)}
+                className="mr-2"
               />
-              <Input
-                label="Non-AC Room Price (₹)"
-                type="number"
-                value={formData.rooms.nonAcRoomPrice}
-                onChange={(e) => handleInputChange('rooms.nonAcRoomPrice', e.target.value)}
-                placeholder="₹ 0"
-                required
-                fullWidth
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Room Amenities</label>
-              <Select
-                options={[
-                  { value: '', label: 'Select amenities' },
-                  { value: 'WiFi', label: 'WiFi' },
-                  { value: 'TV', label: 'TV' },
-                  { value: 'AC', label: 'Air Conditioning' },
-                ]}
-                fullWidth
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Outdoor Facilities */}
-        <div className="bg-yellow-50 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4">Outdoor Facilities</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Available Outdoor Facilities</label>
-              <Select
-                options={[
-                  { value: '', label: 'Select outdoor facilities' },
-                  ...outdoorFacilitiesOptions.map(facility => ({ value: facility, label: facility }))
-                ]}
-                fullWidth
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Alcohol Policy <span className="text-red-500">*</span>
-              </label>
-              <Select
-                options={[
-                  { value: '', label: 'Select alcohol policy' },
-                  { value: 'Allowed', label: 'Allowed' },
-                  { value: 'Not Allowed', label: 'Not Allowed' },
-                  { value: 'With Permission', label: 'With Permission' },
-                ]}
-                fullWidth
-              />
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">Parking Capacity</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Two Wheeler Capacity"
-                  type="number"
-                  fullWidth
-                />
-                <Input
-                  label="Four Wheeler Capacity"
-                  type="number"
-                  fullWidth
-                />
-              </div>
-            </div>
-          </div>
+              <span className="text-sm">{amenity}</span>
+            </label>
+          ))}
         </div>
       </div>
 
-      {/* Indoor Facilities */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Indoor Facilities</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Power Backup <span className="text-red-500">*</span>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Outdoor Facilities
+        </label>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+          {outdoorFacilitiesOptions.map((facility) => (
+            <label key={facility} className="flex items-center">
+              <input
+                type="checkbox"
+                checked={formData.outdoorFacilities.includes(facility)}
+                onChange={() => handleArrayToggle('outdoorFacilities', facility)}
+                className="mr-2"
+              />
+              <span className="text-sm">{facility}</span>
             </label>
-            <Select
-              options={[
-                { value: '', label: 'Select power backup' },
-                { value: 'Full Backup', label: 'Full Backup' },
-                { value: 'Partial Backup', label: 'Partial Backup' },
-                { value: 'No Backup', label: 'No Backup' },
-              ]}
-              fullWidth
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              WiFi Availability <span className="text-red-500">*</span>
-            </label>
-            <Select
-              options={[
-                { value: '', label: 'Select WiFi availability' },
-                { value: 'Free WiFi', label: 'Free WiFi' },
-                { value: 'Paid WiFi', label: 'Paid WiFi' },
-                { value: 'No WiFi', label: 'No WiFi' },
-              ]}
-              fullWidth
-            />
-          </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Power Backup <span className="text-red-500">*</span>
+          </label>
+          <Select
+            options={[
+              { value: '', label: 'Select power backup' },
+              { value: 'Full Backup', label: 'Full Backup' },
+              { value: 'Partial Backup', label: 'Partial Backup' },
+              { value: 'No Backup', label: 'No Backup' },
+            ]}
+            fullWidth
+          />
         </div>
         <div>
-          <label className="flex items-center">
-            <input type="checkbox" className="mr-2" />
-            <span>Elevator Available</span>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            WiFi Availability <span className="text-red-500">*</span>
           </label>
+          <Select
+            options={[
+              { value: '', label: 'Select WiFi availability' },
+              { value: 'Free WiFi', label: 'Free WiFi' },
+              { value: 'Paid WiFi', label: 'Paid WiFi' },
+              { value: 'No WiFi', label: 'No WiFi' },
+            ]}
+            fullWidth
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Alcohol Policy <span className="text-red-500">*</span>
+        </label>
+        <Select
+          options={[
+            { value: '', label: 'Select alcohol policy' },
+            { value: 'Allowed', label: 'Allowed' },
+            { value: 'Not Allowed', label: 'Not Allowed' },
+            { value: 'With Permission', label: 'With Permission' },
+          ]}
+          fullWidth
+        />
+      </div>
+
+      <div>
+        <h4 className="font-medium mb-2">Parking Capacity</h4>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <Input
+            label="Two Wheeler Capacity"
+            type="number"
+            fullWidth
+          />
+          <Input
+            label="Four Wheeler Capacity"
+            type="number"
+            fullWidth
+          />
         </div>
       </div>
     </div>
@@ -663,8 +569,7 @@ export default function MandapFormPage() {
 
   const renderBookingPayments = () => (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Payment Details */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-green-50 p-4 rounded-lg">
           <h3 className="text-lg font-semibold mb-4">Payment Details</h3>
           <div className="space-y-4">
@@ -680,18 +585,23 @@ export default function MandapFormPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Payment Methods Accepted <span className="text-red-500">*</span>
               </label>
-              <Select
-                options={[
-                  { value: '', label: 'Select payment methods' },
-                  ...paymentOptions.map(method => ({ value: method, label: method }))
-                ]}
-                fullWidth
-              />
+              <div className="grid grid-cols-2 gap-2">
+                {paymentOptions.map((method) => (
+                  <label key={method} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formData.paymentMethods.includes(method)}
+                      onChange={() => handleArrayToggle('paymentMethods', method)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm">{method}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Booking Process */}
         <div className="bg-purple-50 p-4 rounded-lg">
           <h3 className="text-lg font-semibold mb-4">Booking Process</h3>
           <div className="space-y-4">
@@ -724,6 +634,17 @@ export default function MandapFormPage() {
                 fullWidth
               />
             </div>
+            <div>
+              <label className="flex items-center">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isExternalCateringAllowed}
+                  onChange={(e) => handleInputChange('isExternalCateringAllowed', e.target.checked)}
+                  className="mr-2" 
+                />
+                <span>External Catering Allowed</span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -737,10 +658,8 @@ export default function MandapFormPage() {
       case 2:
         return renderVenueDetails();
       case 3:
-        return renderServices();
-      case 4:
         return renderFacilities();
-      case 5:
+      case 4:
         return renderBookingPayments();
       default:
         return renderBasicInfo();
@@ -748,7 +667,7 @@ export default function MandapFormPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6 p-4 sm:p-6">
       <div className="flex items-center">
         <Button
           variant="ghost"
@@ -758,35 +677,37 @@ export default function MandapFormPage() {
         >
           Back
         </Button>
-        <h1 className="text-2xl font-bold text-gray-900 ml-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 ml-4">
           {isEditing ? 'Edit Mandap' : 'Add New Mandap'}
         </h1>
       </div>
 
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           {renderStepIndicator()}
           
           <div className="min-h-[500px]">
             {renderCurrentStep()}
           </div>
 
-          <div className="flex justify-between mt-8">
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mt-8">
             <Button
               variant="outline"
               onClick={prevStep}
               disabled={currentStep === 1}
               icon={<ArrowLeft className="h-4 w-4" />}
+              fullWidth={window.innerWidth < 640}
             >
               Previous
             </Button>
             
-            {currentStep === 5 ? (
+            {currentStep === 4 ? (
               <Button
                 onClick={handleSubmit}
                 loading={loading}
                 icon={<Save className="h-4 w-4" />}
                 className="bg-orange-500 hover:bg-orange-600"
+                fullWidth={window.innerWidth < 640}
               >
                 Submit Registration
               </Button>
@@ -794,6 +715,7 @@ export default function MandapFormPage() {
               <Button
                 onClick={nextStep}
                 className="bg-orange-500 hover:bg-orange-600"
+                fullWidth={window.innerWidth < 640}
               >
                 Next
               </Button>

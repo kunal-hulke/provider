@@ -14,6 +14,10 @@ import PaymentsPage from './pages/payments/PaymentsPage';
 import ReviewsPage from './pages/reviews/ReviewsPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
+import VendorsPage from './pages/vendors/VendorsPage';
+import CatererFormPage from './pages/vendors/CatererFormPage';
+import PhotographerFormPage from './pages/vendors/PhotographerFormPage';
+import RoomFormPage from './pages/vendors/RoomFormPage';
 
 export default function App() {
   return (
@@ -39,6 +43,13 @@ export default function App() {
                     <Route path="/reviews" element={<ReviewsPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/notifications" element={<NotificationsPage />} />
+                    <Route path="/vendors" element={<VendorsPage />} />
+                    <Route path="/vendors/caterers/new" element={<CatererFormPage />} />
+                    <Route path="/vendors/caterers/:id/edit" element={<CatererFormPage />} />
+                    <Route path="/vendors/photographers/new" element={<PhotographerFormPage />} />
+                    <Route path="/vendors/photographers/:id/edit" element={<PhotographerFormPage />} />
+                    <Route path="/vendors/rooms/new" element={<RoomFormPage />} />
+                    <Route path="/vendors/rooms/:id/edit" element={<RoomFormPage />} />
                   </Routes>
                 </Layout>
               </ProtectedRoute>
