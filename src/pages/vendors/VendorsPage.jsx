@@ -3,9 +3,34 @@ import { Link } from 'react-router-dom';
 import { Plus, Users, Camera, Utensils, Bed } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { caterers, photographers, rooms } from '../../utils/mock-data';
 
 const VendorsPage = () => {
+  // Mock data for demonstration
+  const caterers = [
+    {
+      id: '1',
+      catererName: 'Royal Caterers',
+      foodType: 'Both',
+      isActive: true
+    }
+  ];
+
+  const photographers = [
+    {
+      id: '1',
+      photographerName: 'Capture Moments',
+      isActive: true
+    }
+  ];
+
+  const rooms = [
+    {
+      id: '1',
+      mandapId: '1',
+      isActive: true
+    }
+  ];
+
   return (
     <div className="space-y-6 p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -60,6 +85,24 @@ const VendorsPage = () => {
               <Link to="/vendors/photographers/new">
                 <Button variant="outline" size="sm" fullWidth>
                   Add Photographer
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <CardContent className="p-6 text-center">
+            <div className="p-4 bg-primary-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <Bed className="h-8 w-8 text-primary-500" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Rooms</h3>
+            <p className="text-3xl font-bold text-primary-600 mb-2">{rooms.length}</p>
+            <p className="text-sm text-gray-500">Active rooms</p>
+            <div className="mt-4">
+              <Link to="/vendors/rooms/new">
+                <Button variant="outline" size="sm" fullWidth>
+                  Add Room
                 </Button>
               </Link>
             </div>
