@@ -5,7 +5,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Ca
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
-import { reviews, mandaps } from '../../utils/mock-data';
 import { format } from 'date-fns';
 
 export default function ReviewsPage() {
@@ -14,7 +13,59 @@ export default function ReviewsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [ratingFilter, setRatingFilter] = useState('all');
   
-  // If id is provided, show reviews for specific mandap, otherwise show all reviews
+  // Mock data for reviews
+  const reviews = [
+    {
+      id: '1',
+      mandapId: '1',
+      userId: 'u1',
+      userName: 'Priya Sharma',
+      rating: 5,
+      comment: 'Beautiful venue with excellent amenities. The staff was very helpful and professional.',
+      createdAt: '2024-02-15T10:30:00Z',
+      images: [
+        'https://images.pexels.com/photos/1114425/pexels-photo-1114425.jpeg',
+        'https://images.pexels.com/photos/1157557/pexels-photo-1157557.jpeg'
+      ]
+    },
+    {
+      id: '2',
+      mandapId: '1',
+      userId: 'u2',
+      userName: 'Rahul Verma',
+      rating: 4,
+      comment: 'Great location and beautiful decor. Slightly expensive but worth it.',
+      createdAt: '2024-02-10T15:20:00Z'
+    },
+    {
+      id: '3',
+      mandapId: '2',
+      userId: 'u3',
+      userName: 'Anjali Patel',
+      rating: 5,
+      comment: 'Perfect venue for our wedding. The banquet hall is stunning!',
+      createdAt: '2024-02-05T09:15:00Z',
+      images: [
+        'https://images.pexels.com/photos/587741/pexels-photo-587741.jpeg'
+      ]
+    }
+  ];
+
+  // Mock mandaps data
+  const mandaps = [
+    {
+      id: '1',
+      mandapName: 'Laxmi Garden',
+      name: 'Laxmi Garden'
+    },
+    {
+      id: '2',
+      mandapName: 'Royal Banquet',
+      name: 'Royal Banquet'
+    }
+  ];
+  
+  // Filter reviews based on mandap ID if provided
   let filteredReviews = reviews.filter(review => {
     if (id && review.mandapId !== id) return false;
     
@@ -25,18 +76,6 @@ export default function ReviewsPage() {
     
     return matchesSearch && matchesRating;
   });
-  
-  // If no specific mandap ID, show all reviews
-  if (!id) {
-    filteredReviews = reviews.filter(review => {
-      const matchesSearch = review.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           review.comment.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesRating = ratingFilter === 'all' || review.rating.toString() === ratingFilter;
-      
-      return matchesSearch && matchesRating;
-    });
-  }
   
   const mandap = id ? mandaps.find(m => m.id === id) : null;
   const averageRating = filteredReviews.length > 0
@@ -68,10 +107,10 @@ export default function ReviewsPage() {
               Back to Mandaps
             </Button>
           )}
+          <h1 className="text-2xl font-bold text-gray-900">
+            {mandap ? `Reviews for ${mandap.mandapName || mandap.name}` : 'All Reviews'}
+          </h1>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {mandap ? `Reviews for ${mandap.mandapName || mandap.name}` : 'All Reviews'}
-        </h1>
         <div className="flex items-center space-x-2">
           <div className="flex items-center">
             <Star className="h-5 w-5 text-yellow-400 fill-current" />
