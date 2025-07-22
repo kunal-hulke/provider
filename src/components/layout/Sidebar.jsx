@@ -1,14 +1,14 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Calendar, Book, Settings, LogOut, DollarSign, Building, Users, Store } from 'lucide-react';
+import { Home, Calendar, Book, Settings, LogOut, DollarSign, ChevronDown, Building, Users, Store } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Sidebar({ onClose }) {
   const { user, logout } = useAuth();
+  const [isManagementOpen, setIsManagementOpen] = React.useState(true);
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Mandaps', href: '/mandaps', icon: Building },
     { name: 'Calendar', href: '/calendar', icon: Calendar },
     { name: 'Bookings', href: '/bookings', icon: Book },
     { name: 'Payments', href: '/payments', icon: DollarSign },
@@ -49,6 +49,37 @@ export default function Sidebar({ onClose }) {
             {item.name}
           </NavLink>
         ))}
+
+        <div className="pt-2 pb-1">
+          <button
+            onClick={() => setIsManagementOpen(!isManagementOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-100"
+          >
+            <span className="flex items-center">
+              <Building className="mr-3 h-5 w-5" />
+              Mandap Management
+            </span>
+            <ChevronDown className={`h-4 w-4 transition-transform ${isManagementOpen ? 'transform rotate-180' : ''}`} />
+          </button>
+          
+          {isManagementOpen && (
+            <div className="ml-6 mt-1 space-y-1">
+              <NavLink
+                to="/mandaps"
+                className={({ isActive }) => 
+                  `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                    isActive
+                      ? 'bg-primary-100 text-primary-700'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  }`
+                }
+                onClick={handleNavClick}
+              >
+                Manage Mandaps
+              </NavLink>
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* User section */}
