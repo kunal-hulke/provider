@@ -18,6 +18,10 @@ import VendorsPage from './pages/vendors/VendorsPage';
 import CatererFormPage from './pages/vendors/CatererFormPage';
 import PhotographerFormPage from './pages/vendors/PhotographerFormPage';
 import RoomFormPage from './pages/vendors/RoomFormPage';
+import VendorsPage from './pages/vendors/VendorsPage';
+import CatererFormPage from './pages/vendors/CatererFormPage';
+import PhotographerFormPage from './pages/vendors/PhotographerFormPage';
+import RoomFormPage from './pages/vendors/RoomFormPage';
 
 export default function App() {
   return (

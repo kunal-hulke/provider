@@ -64,16 +64,15 @@ export default function MandapCard({ mandap, onDelete }) {
         </div>
         
         <div className="mt-4 flex space-x-2">
-          <Link to={`/mandaps/edit/${mandap.id}`} className="flex-1">
-            <Button
-              variant="outline"
-              size="sm"
-              fullWidth
-              icon={<Edit className="h-4 w-4" />}
-            >
-              Edit
-            </Button>
-          </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => onEdit(mandap)}
+            icon={<Edit className="h-4 w-4" />}
+          >
+            Edit
+          </Button>
           <Button
             variant="danger"
             size="sm"

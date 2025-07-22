@@ -75,20 +75,7 @@ export default function Sidebar({ onClose }) {
                 }
                 onClick={handleNavClick}
               >
-                All Mandaps
-              </NavLink>
-              <NavLink
-                to="/mandaps/new"
-                className={({ isActive }) => 
-                  `flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                  }`
-                }
-                onClick={handleNavClick}
-              >
-                Add New Mandap
+                Manage Mandaps
               </NavLink>
             </div>
           )}
