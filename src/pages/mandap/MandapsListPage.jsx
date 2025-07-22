@@ -81,33 +81,19 @@ const MandapsListPage = () => {
             <option value="medium-capacity">Medium Capacity (200-399)</option>
             <option value="low-capacity">Low Capacity (&lt;200)</option>
           </select>
-            <Button 
-              icon={<Plus className="h-4 w-4" />}
-              onClick={() => setShowAddForm(true)}
-            >
-              Add New Mandap
-            </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredMandaps.map(mandap => (
           <MandapCard key={mandap.id} mandap={mandap} onDelete={handleDelete} />
         ))}
       </div>
 
       {filteredMandaps.length === 0 && (
-            <MandapCard 
-              key={mandap.id} 
-              mandap={mandap} 
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-            />
+        <div className="text-center py-12">
           <p className="text-gray-500 text-lg">No venues found matching your criteria.</p>
         </div>
-      )}
-      
-      {showAddForm && (
-        <MandapFormModal
-          mandap={editingMandap}
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
       )}
     </div>
   );
