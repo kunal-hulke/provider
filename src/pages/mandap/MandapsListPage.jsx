@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Plus } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import MandapCard from '../../components/mandap/MandapCard';
+import MandapFormModal from '../../components/mandap/MandapFormModal';
 
 const MandapsListPage = () => {
   const [mandaps, setMandaps] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
+  const [showModal, setShowModal] = useState(false);
+  const [editingMandap, setEditingMandap] = useState(null);
 
   useEffect(() => {
     // Mock data - replace with actual API call
@@ -44,6 +49,40 @@ const MandapsListPage = () => {
     setMandaps(prevMandaps => prevMandaps.filter(mandap => mandap.id !== mandapId));
   };
 
+  const handleEdit = (mandap) => {
+    setEditingMandap(mandap);
+    setShowModal(true);
+  };
+
+  const handleAddNew = () => {
+    setEditingMandap(null);
+    setShowModal(true);
+  };
+
+  const handleSave = (formData) => {
+    if (editingMandap) {
+      // Update existing mandap
+      setMandaps(prevMandaps => 
+        prevMandaps.map(mandap => 
+          mandap.id === editingMandap.id ? { ...mandap, ...formData } : mandap
+        )
+      );
+    } else {
+      // Add new mandap
+      const newMandap = {
+        id: Date.now(),
+        ...formData
+      };
+      setMandaps(prevMandaps => [...prevMandaps, newMandap]);
+    }
+    setShowModal(false);
+    setEditingMandap(null);
+  };
+
+  const handleCancel = () => {
+    setShowModal(false);
+    setEditingMandap(null);
+  };
   const filteredMandaps = mandaps.filter(mandap => {
     const matchesSearch = mandap.mandapName.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           mandap.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -60,7 +99,16 @@ const MandapsListPage = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Wedding Venues</h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <h1 className="text-3xl font-bold text-gray-900">Manage Mandaps</h1>
+          <Button
+            onClick={handleAddNew}
+            icon={<Plus className="h-4 w-4" />}
+            className="w-full sm:w-auto"
+          >
+            Add New Mandap
+          </Button>
+        </div>
         
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <input
@@ -86,7 +134,7 @@ const MandapsListPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredMandaps.map(mandap => (
-          <MandapCard key={mandap.id} mandap={mandap} onDelete={handleDelete} />
+          <MandapCard key={mandap.id} mandap={mandap} onDelete={handleDelete} onEdit={handleEdit} />
         ))}
       </div>
 
@@ -94,6 +142,14 @@ const MandapsListPage = () => {
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">No venues found matching your criteria.</p>
         </div>
+      )}
+
+      {showModal && (
+        <MandapFormModal
+          mandap={editingMandap}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
       )}
     </div>
   );

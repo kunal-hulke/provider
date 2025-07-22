@@ -7,17 +7,12 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import MandapsListPage from './pages/mandap/MandapsListPage';
-import MandapFormPage from './pages/mandap/MandapFormPage';
 import BookingsPage from './pages/bookings/BookingsPage';
 import CalendarPage from './pages/calendar/CalendarPage';
 import PaymentsPage from './pages/payments/PaymentsPage';
 import ReviewsPage from './pages/reviews/ReviewsPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import NotificationsPage from './pages/notifications/NotificationsPage';
-import VendorsPage from './pages/vendors/VendorsPage';
-import CatererFormPage from './pages/vendors/CatererFormPage';
-import PhotographerFormPage from './pages/vendors/PhotographerFormPage';
-import RoomFormPage from './pages/vendors/RoomFormPage';
 import VendorsPage from './pages/vendors/VendorsPage';
 import CatererFormPage from './pages/vendors/CatererFormPage';
 import PhotographerFormPage from './pages/vendors/PhotographerFormPage';
@@ -39,8 +34,6 @@ export default function App() {
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/mandaps" element={<MandapsListPage />} />
-                    <Route path="/mandaps/new" element={<MandapFormPage />} />
-                    <Route path="/mandaps/:id/edit" element={<MandapFormPage />} />
                     <Route path="/bookings" element={<BookingsPage />} />
                     <Route path="/calendar" element={<CalendarPage />} />
                     <Route path="/payments" element={<PaymentsPage />} />
